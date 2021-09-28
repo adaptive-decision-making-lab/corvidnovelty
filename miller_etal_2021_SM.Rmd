@@ -1,0 +1,333 @@
+---
+title             : "Supplementary Materials: Individual repeatability, species differences, and the influence of socio-ecological factors on neophobia in 10 corvid species"
+shorttitle        : "Supplementary Materials"
+
+
+keywords          : "keywords"
+wordcount         : "X"
+
+floatsintext      : yes
+figurelist        : no
+tablelist         : no
+footnotelist      : no
+linenumbers       : no
+mask              : no
+draft             : no
+
+documentclass     : "apa6"
+classoption       : "doc"
+output            : papaja::apa6_pdf
+---
+
+```{r setup, include = FALSE}
+library(papaja)
+library(here)
+library(knitr)
+library(kableExtra)
+# r_refs("r-references.bib")
+source("miller_etal_2021_rcode.R")
+library(tidyverse)
+
+```
+
+```{r analysis-preferences}
+# Seed for random number generation
+set.seed(42)
+knitr::opts_chunk$set(cache.extra = knitr::rand_seed)
+```
+
+
+\renewcommand{\thetable}{S\arabic{table}}
+\setcounter{table}{0}
+\renewcommand{\thefigure}{S\arabic{figure}}
+\setcounter{figure}{0}
+
+\renewcommand{\arraystretch}{1.35}
+
+
+\clearpage
+
+
+
+
+<!--(Figure S1)-->
+(ref:round-fig-cap) Latency to touch familiar food in each round, across all conditions and species. Round 3 differs from round 1 and 2, while round 1 and 2 do not differ from each other. Points represent individuals, lines represent median.
+
+```{r tasks-fig, fig.cap = "(ref:round-fig-cap)", out.width="100%"}
+knitr::include_graphics(path = here("figures/latency_round.png"))
+```
+
+
+<!--(Figure S2)-->
+(ref:lab-fig-cap) Lab effect on latency to touch familiar food in azure-winged magpies, carrion crows, and pinyon jays.
+
+```{r lab-fig, warning = F, fig.cap = "(ref:lab-fig-cap)", out.width="100%"}
+knitr::include_graphics(path = here("figures/latency_lab.png"))
+```
+
+<!--(Figure S2)-->
+(ref:example-fig-cap) Example of novel objects for Eurasian jays.
+
+```{r example-fig, warning = F, fig.cap = "(ref:example-fig-cap)", out.width="100%"}
+knitr::include_graphics(path = here("figures/example_object.jpg"))
+```
+
+
+\clearpage
+
+<!--(Table S1: Pairwise comparisons of latency data between species)-->
+```{r}
+# latency_species_table <- data.frame(estimate = latency_species_glht$test$coefficients, se = latency_species_glht$test$sigma, z = latency_species_glht$test$tstat, p = latency_species_glht$test$pvalues)
+# knitr::kable(latency_species_table, col.names = c("Estimate", "Standard error", "z", "p-value"), 
+#              digits = 3, booktabs = TRUE, 
+#              caption = "Pairwise comparisons of latency data between species",
+#              linesep = "") %>% 
+#   kable_styling(font_size = 8)
+```
+
+<!--(Table S1: Linear mixed models with main effect of lab on latency to touch familiar food for the three species that were tested in two labs)-->
+```{r}
+lab_table <- data.frame(matrix(c("lab", lab_carrioncrow$LRT[2], lab_carrioncrow$npar[2], lab_carrioncrow$`Pr(Chi)`[2], lab_azurewingedmagpie$LRT[2], lab_azurewingedmagpie$npar[2], lab_azurewingedmagpie$`Pr(Chi)`[2], lab_pinyonjay$LRT[2], lab_pinyonjay$npar[2], lab_pinyonjay$`Pr(Chi)`[2]), nrow = 1))
+lab_table <- mutate(lab_table, across(X2:X10, as.numeric))
+knitr::kable(lab_table, col.names = c("Fixed effect", "$\\chi^2$", "df", "p-value", "$\\chi^2$", "df", "p-value", "$\\chi^2$", "df", "p-value"),
+             digits = 3, booktabs = TRUE, linesep = "", escape = FALSE,
+             caption = "Linear mixed models with main effect of lab on latency to touch familiar food for the three species that were tested in two labs") %>% 
+  kable_styling(font_size = 8 ) %>% 
+  add_header_above(c("", "Azure-winged magpie" = 3, "Carrion crow" = 3, "Pinyon jay" = 3))
+
+```
+<!--(Table S2: Pairwise comparisons of novel object difference scores between species)-->
+```{r}
+diffobject_species_table <- data.frame(estimate = diffscore_species_novelobject_glht$test$coefficients, se = diffscore_species_novelobject_glht$test$sigma, z = diffscore_species_novelobject_glht$test$tstat, p = diffscore_species_novelobject_glht$test$pvalues)
+diffobject_species_table <- diffobject_species_table %>% 
+  mutate(p = ifelse(p < 0.05, paste0("\\textbf{", printnum(p, digits = 3), "}"), printnum(p, digits = 3)))
+knitr::kable(diffobject_species_table, col.names = c("Estimate", "Standard error", "z", "p-value"), 
+             digits = 3, booktabs = TRUE, escape = FALSE, align = "rrrr",
+             caption = "Pairwise comparisons of novel object difference scores between species",
+             linesep = "") %>% 
+  kable_styling(font_size = 8)
+```
+
+<!--(Table S3: Pairwise comparisons of novel food difference scores between species)-->
+```{r}
+difffood_species_table <- data.frame(estimate = diffscore_species_novelfood_glht$test$coefficients, se = diffscore_species_novelfood_glht$test$sigma, z = diffscore_species_novelfood_glht$test$tstat, p = diffscore_species_novelfood_glht$test$pvalues)
+difffood_species_table <- difffood_species_table %>% 
+  mutate(p = ifelse(p < 0.05, paste0("\\textbf{", printnum(p, digits = 3), "}"), printnum(p, digits = 3)))
+knitr::kable(difffood_species_table, col.names = c("Estimate", "Standard error", "z", "p-value"), 
+             digits = 3, booktabs = TRUE, linesep = "", escape = FALSE, align = "rrrr",
+             caption = "Pairwise comparisons of novel food difference scores between species"
+) %>% 
+  kable_styling(font_size = 8)
+```
+
+<!--(Table S5: Individual temporal repeatability within each species and condition (difference scores))-->
+```{r}
+# condition_species_diff_rep_table <- condition_species_diff_rep %>% 
+#   pivot_wider(id_cols = species, names_from = condition, values_from = n:p_value) %>%
+#   select(species, contains("Novel object"), contains("Novel food")) %>% 
+#   mutate(across(-species, as.numeric),
+#          across(contains("n_"), as.integer),
+#          across(where(is.numeric), ~printnum(.x, digits = 3))) %>% 
+#   mutate(species = str_replace(species, "ʻ", "'"),
+#          Novel_object = paste0("N=", `n_Control - Novel object`, ", R=", `icc_Control - Novel object`, " (", `lowerCI_Control - Novel object`, ", ", `upperCI_Control - Novel object`, "), p = ", `p_value_Control - Novel object`),
+#          Novel_food = paste0("N=", `n_Control - Novel food`, ", R=", `icc_Control - Novel food`, " (", `lowerCI_Control - Novel food`, ", ", `upperCI_Control - Novel food`, "), p = ", `p_value_Control - Novel food`)
+#   ) %>% 
+#   select(species, Novel_object, Novel_food) %>% 
+#   mutate(across(Novel_object:Novel_food, ~str_replace(.x, "p = 0.000", "p < 0.001")))
+# condition_species_diff_rep_table$Novel_food[condition_species_diff_rep_table$Novel_food == "N=NA, R=NA (NA, NA), p = NA"] <- "NA"
+# knitr::kable(condition_species_diff_rep_table, col.names = c("Species", "Control - Novel object", "Control - Novel food"),
+#              booktabs = TRUE, linesep = "",
+#              caption = "Individual temporal repeatability within each species and condition (difference scores)") %>% 
+#   kable_styling(font_size = 8)
+
+```
+
+<!--(Table S6: Individual contextual repeatability within each species (difference scores))-->
+```{r}
+# species_diff_rep_table <- species_diff_rep %>% 
+#   mutate(n = as.integer(n),
+#          across(icc:p_value, as.numeric),
+#          across(where(is.numeric), ~printnum(.x, digits = 3)),
+#          summary = paste0("N=", n, ", R=", icc, " (", lowerCI, ", ", upperCI, "), p = ", p_value),
+#          summary = str_replace(summary, "p = 0.000", "p < 0.001")) %>% 
+#   select(species, summary)
+# knitr::kable(species_diff_rep_table, col.names = c("Species", "Repeatability across conditions"),
+#              booktabs = TRUE, linesep = "", 
+#              caption = "Individual contextual repeatability within each species (difference scores)") %>% 
+#   kable_styling(font_size = 8)
+```
+
+
+<!--(Table S7: Individual temporal and contextual repeatability (difference scores))-->
+```{r}
+# condition_diff_rep_table <- condition_diff_rep %>% 
+#   bind_rows(diff_rpt_all) %>% 
+#   mutate(n = as.integer(n),
+#          across(icc:p_value, as.numeric),
+#          across(where(is.numeric), ~printnum(.x, digits = 3)),
+#          summary = paste0("N=", n, ", R=", icc, " (", lowerCI, ", ", upperCI, "), p = ", p_value),
+#          summary = str_replace(summary, "p = 0.000", "p < 0.001")) %>% 
+#   select(condition, summary) %>% 
+#   pivot_wider(names_from = condition, values_from = summary)
+# knitr::kable(condition_diff_rep_table, 
+#              booktabs = TRUE, 
+#              caption = "Individual temporal and contextual repeatability (difference scores)") %>% 
+#   kable_styling(font_size = 8) %>% 
+#   column_spec(1:3, width = "1.35in")
+```
+
+<!--(Table S4: Individual temporal and contextual repeatability (raw scores))-->
+```{r warning = FALSE}
+condition_raw_rep_table <- condition_raw_rep %>% 
+  bind_rows(raw_row) %>% 
+  mutate(n = as.integer(n),
+         across(icc:p_value, as.numeric),
+         across(where(is.numeric), ~printnum(.x, digits = 3)),
+         summary = paste0("N=", n, ", R=", icc, " (", lowerCI, ", ", upperCI, "), p = ", p_value),
+         summary = str_replace(summary, "p = 0.000", "p < 0.001")) %>% 
+  dplyr::select(condition, summary) %>% 
+  pivot_wider(names_from = condition, values_from = summary)
+knitr::kable(condition_raw_rep_table, 
+             booktabs = TRUE, 
+             caption = "Individual temporal and contextual repeatability") %>% 
+  kable_styling(font_size = 8) %>% 
+  column_spec(1:4, width = "1.35in")
+```
+
+<!--(Table S5: Individual temporal repeatability within each species and condition (raw scores))-->
+```{r}
+condition_species_raw_rep_table <- condition_species_raw_rep %>% 
+  pivot_wider(id_cols = species, names_from = condition, values_from = n:p_value) %>%
+  select(species, contains("Control"), contains("Novel object"), contains("Novel food")) %>% 
+  # rename(lowerCI_Control = lowerCi_Control, `lowerCI_Novel object` = `lowerCi_Novel object`, `lowerCI_Novel food` = `lowerCi_Novel food`) %>% 
+  mutate(across(-species, as.numeric),
+         across(contains("n_"), as.integer),
+         across(where(is.numeric), ~printnum(.x, digits = 3))) %>% 
+  mutate(species = str_replace(species, "ʻ", "'"),
+         Control = paste0("N=", n_Control, ", R=", icc_Control, " (", lowerCI_Control, ", ", upperCI_Control, "), p = ", p_value_Control),
+         Novel_object = paste0("N=", `n_Novel object`, ", R=", `icc_Novel object`, " (", `lowerCI_Novel object`, ", ", `upperCI_Novel object`, "), p = ", `p_value_Novel object`),
+         Novel_food = paste0("N=", `n_Novel food`, ", R=", `icc_Novel food`, " (", `lowerCI_Novel food`, ", ", `upperCI_Novel food`, "), p = ", `p_value_Novel food`)
+  ) %>% 
+  select(species, Control, Novel_object, Novel_food) %>% 
+  mutate(across(Control:Novel_food, ~str_replace(.x, "p = 0.000", "p < 0.001")))
+condition_species_raw_rep_table$Novel_food[condition_species_raw_rep_table$Novel_food == "N=NA, R=NA (NA, NA), p = NA"] <- "NA"
+knitr::kable(condition_species_raw_rep_table, col.names = c("Species", "Control", "Novel object", "Novel food"),
+             booktabs = TRUE, linesep = "",
+             caption = "Individual temporal repeatability within each species and condition") %>% 
+  kable_styling(font_size = 8) %>% 
+  column_spec(1, width = "1.15in") %>% 
+  column_spec(2:4, width = "1.3in")
+
+```
+
+<!--(Table S6: Individual contextual repeatability within each species (raw scores))-->
+```{r}
+species_raw_rep_table <- species_raw_rep %>% 
+  mutate(n = as.integer(n),
+         across(icc:p_value, as.numeric),
+         across(where(is.numeric), ~printnum(.x, digits = 3)),
+         summary = paste0("N=", n, ", R=", icc, " (", lowerCI, ", ", upperCI, "), p = ", p_value),
+         summary = str_replace(summary, "p = 0.000", "p < 0.001")) %>% 
+  select(species, summary)
+knitr::kable(species_raw_rep_table, col.names = c("Species", "Repeatability across conditions"),
+             booktabs = TRUE, linesep = "", 
+             caption = "Individual contextual repeatability within each species") %>% 
+  kable_styling(font_size = 8)
+```
+
+
+
+
+<!--(Table S7: Subject information, including sex, source and participation in testing)-->
+```{r}
+demographics_table <- data.frame(species = c("Common raven \\newline\\emph{Corvus corax}",
+                                             "Carrion/hooded crow \\newline\\emph{C. corone; C. cornix}",
+                                             "Carrion crow \\newline\\emph{C. corone}",
+                                             "Large-billed crow \\newline\\emph{C. macrorhynchos}",
+                                             "New Caledonian crow \\newline\\emph{C. moneduloides}",
+                                             "'Alalā \\newline\\emph{C. hawaiiensis}",
+                                             "Eurasian jay \\newline\\emph{Garrulus glandarius}",
+                                             "Pinyon jay \\newline\\emph{Gymnorhinus cyanocephalus}",
+                                             "Pinyon jay \\newline\\emph{Gymnorhinus cyanocephalus}",
+                                             "Blue jay \\newline\\emph{Cyanocitta cristata}",
+                                             "Clark's nutcracker \\newline\\emph{Nucifraga columbiana}",
+                                             "Azure-winged magpie \\newline\\emph{Cyanopica cyanus}",
+                                             "Azure-winged magpie \\newline\\emph{Cyanopica cyanus}"),
+                                 lab = c("Bugnyar","Bugnyar", "Nieder", "Izawa", "Taylor","Greggor", "Clayton",
+                                         "Stevens", "Kelly", "Gould", "Kelly", "Li", "Bugnyar \\& Massen"),
+                                 sex = c("7/8","4/4","10/0","8/5","3/6","64/44",
+                                         "14/10","10/2","4/5","2/2 \\newline(5 unknown)",
+                                         "7/3","6/2","2/4"),
+                                 age = c("15/0", "8/0", "10/0", "13/0", "4/5", "93/25", 
+                                         "24/0", "12/0", "9/0", "9/0", "10/0", "8/0", "6/0"),
+                                 rearing = c("Hand-reared",
+                                             "Hand-reared","Hand-reared","Wild: parent reared",
+                                             "Wild: parent reared","Hand-reared and parent-reared",
+                                             "Hand-reared","Wild: parent reared","Wild: parent reared",
+                                             "Hand-reared","Wild: parent reared",
+                                             "Parent-reared \\& Hand-reared","Parent-reared \\& Hand-reared"),
+                                 housing = c("Group/pair","Group/pair",
+                                             "Group","Group","Group","Group/pair","Group",
+                                             "Individual cages","Individual cages","Individual cages",
+                                             "Individual cages","Individual cages","Group"),
+                                 feeding = c("No (fed prior to testing)", "No (fed prior to testing)", 
+                                             "Yes (tested before feeding)", "Yes (fed 2 hours prior)", 
+                                             "No (fed prior to testing)", "No", "Yes (fed 1 hour prior)", 
+                                             "No (tested at feeding time, fed after testing)", 
+                                             "No (tested at feeding time, fed after testing)", 
+                                             "No (tested at feeding time, fed after testing)", 
+                                             "No (tested at feeding time, fed after testing", 
+                                             "No (tested at feeding time, fed after testing", 
+                                             "No (fed prior to testing)"),
+                                 cage_size = c("3$\\times$4$\\times$5", "3$\\times$4$\\times$5", 
+                                               "1.4$\\times$1$\\times$1", "2$\\times$2$\\times$2", 
+                                               "2$\\times$3$\\times$3", 
+                                               "6.1$\\times$6.1$\\times$5.5 – 12.2$\\times$6.1$\\times$5.5", 
+                                               "2$\\times$2$\\times$1", 
+                                               "0.5$\\times$0.7$\\times$0.7", "0.9$\\times$0.6$\\times$0.8", 
+                                               "1$\\times$0.5$\\times$0.5", "0.9$\\times$0.6$\\times$0.8", 
+                                               "0.8$\\times$0.5$\\times$0.9", "4.3$\\times$3$\\times$3"),
+                                 social = c("Alone", "Alone", "Alone", "Alone", "Alone", 
+                                            "Partner or juvenile social group present", 
+                                            "Alone", "Alone", "Alone", "Alone", "Alone", "Alone", "Alone"),
+                                 familiar = c("Yes (constant access)", "Yes (constant access)", 
+                                              "Yes (habituated in prior experiment)", "Yes (constant access)", 
+                                              "Yes (constant access)", "Yes (home cage)", 
+                                              "Yes (constant access)", "Yes (habituated in prior experiment)", 
+                                              "Yes (identical to home cage)", 
+                                              "No (habitutated until ate food in under 10 mintues for 3 consecutive trials)", 
+                                              "Yes (identical to home cage)", 
+                                              "No (habituated with two 30 minute sessions)", 
+                                              "Yes (constant access)"),
+                                 transport = c("Voluntary (trained/encouraged)", 
+                                               "Voluntary (trained/encouraged)", "Moved", "Moved", 
+                                               "Voluntary (flushed)", "Tested in home cage", 
+                                               "Voluntary (trained/encouraged or flushed)", "Moved", 
+                                               "Moved", "Moved", "Moved", "Moved", "Voluntary"),
+                                 neophobia = c("No (but frequent introduction of novel objects and food)", "No (but frequent introduction of novel objects and food)", "No (but frequent introduction of novel objects and food)", "No", "No", "No", "No (but frequent introduction of novel objects and food)", "Yes (experienced novel object task 3 years prior)", "No", "Yes (experienced novel object task 4 years prior", "No", "No", "No"),
+                                 completed = c("1 missing trial for round 2 \\& 3 for all conditions (did not participate)",
+                                               "4 missing trials for control round 2 \\& 3 and food round 3 and object round 3; 1 missing trial from food round 1; 2 missing trials from food round 2 and object round 2 (did not participate)","Yes","Yes","Yes",
+                                               "Control and novel object conditions only (not food condition)",
+                                               "2 missing trials for control round 2; 5 missing trails for control round 3; 4 missing trials for food round 2 \\& 3 and object round 2; with 2 missing trials in object round 3 (did not participate)","Yes","Yes","Yes","Yes","Yes",
+                                               "2 missing trials for round 2 and 3 for all rounds (2 birds died due to unrelated causes)")
+)
+knitr::kable(demographics_table[, 1:7],
+             col.names = c("Species", "Lab", "Sex (males/females or unknown)", "Age (adults/juveniles)", "Rearing information", "Housing", "Controlled feeding schedule"),#, "Rearing information", "Housing", "Completed testing"),
+             format = "latex", booktabs = TRUE, escape = FALSE, linesep = "",
+             caption = "Subject information") %>% 
+  kable_styling(font_size = 8, latex_options = c("hold_position")) %>% 
+  column_spec(1, width = "1.55in") %>%
+  column_spec(2:4, width = "0.8in") %>%
+  column_spec(5:8, width = "1in") %>%
+  # column_spec(6, width = "1.5in") %>% 
+  landscape()
+
+knitr::kable(demographics_table[, c(1, 8:12)],
+             col.names = c("Species", "Cage size (m)", "Testing situation", "Familiar with testing cage", "Transportation to testing cage", "Prior neophobia testing"),
+             format = "latex", booktabs = TRUE, escape = FALSE, linesep = "",) %>% 
+  kable_styling(font_size = 8, latex_options = c("hold_position")) %>% 
+  column_spec(1, width = "1.55in") %>%
+  column_spec(2:6, width = "1in") %>%
+  # column_spec(3:4, width = "0.8in") #%>%
+  landscape()
+```
